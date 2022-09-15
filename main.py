@@ -1,4 +1,5 @@
 import cv2
+import pandas as pd
 from tqdm import tqdm
 from video_cap import VideoCaptureGen
 from obj_recogn import object_detection_on_an_image
@@ -7,12 +8,13 @@ from obj_recogn import object_detection_on_an_image
 def human_detect_on_video(file: str, frame_per_second: int):
     # создадим объект VideoCapture для захвата видео
     video_cap = cv2.VideoCapture(file)
-    vc = VideoCaptureGen(video_cap, width=None, aspect_ratio=True)
+    vc = VideoCaptureGen(video_cap, width=400, aspect_ratio=True)
 
     fourcc = cv2.VideoWriter_fourcc("M", "J", "P", "G")  # Формат кодирования
     video_out = cv2.VideoWriter(r'exit_.avi', fourcc, vc.fps, (vc.width, vc.height), True)
 
     detect_per_second = int(vc.fps) // frame_per_second
+    boxes_result = None
     df = []  # покадрово данные о числе распознанных
 
     for frame, img in tqdm(vc.get_frames_gen(), total=vc.frames):
@@ -24,7 +26,8 @@ def human_detect_on_video(file: str, frame_per_second: int):
             boxes_result = object_detection_on_an_image(img_, infer_speed=None)
 
         # распознавание делаем раз в несколько кадров, а рамки рисуем всё время
-        img = vc.display_boxes(boxes_result, 0.4)  # рисуем на фрейме прямоугольники, в которых определены люди
+        if boxes_result is not None:
+            img = vc.display_boxes(boxes_result, 0.2)  # рисуем на фрейме прямоугольники, в которых определены люди
         # cv2.imwrite('output_.jpg', img_out)
 
         video_out.write(img)
@@ -40,6 +43,7 @@ def human_detect_on_video(file: str, frame_per_second: int):
     video_out.release()
     # закрываем все открытые opencv окна
     cv2.destroyAllWindows()
+    pd.DataFrame(data=df).to_excel('data.xlsx')
 
 
 if __name__ == '__main__':

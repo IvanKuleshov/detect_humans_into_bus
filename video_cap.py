@@ -54,7 +54,7 @@ class VideoCaptureGen:
             y1, x1, y2, x2 = boxes[i]
 
             color_rec = [int(c) for c in np.array(colors[i]) * 255]
-            img_out = cv2.rectangle(img_out, (x1, y1), (x2, y2), color_rec, 1)
+            img_out = cv2.rectangle(img_out, (x1, y1), (x2, y2), color_rec, 2)
 
             # выводим надписи
             # score = scores[i] if scores is not None else None
