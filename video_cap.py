@@ -44,18 +44,24 @@ class VideoCaptureGen:
         self.objects_count = len(boxes)
         colors = self.random_colors(self.objects_count)
         img_out = self.img
+        title = '{}: {}'.format('humans', self.objects_count)
 
         for i, color in enumerate(colors):
             if not np.any(boxes[i]):
                 continue
 
+            # рисуем рамку
             y1, x1, y2, x2 = boxes[i]
-            score = scores[i] if scores is not None else None
-            caption = '{} {:.2f}'.format('human', score) if score else 'human'
 
             color_rec = [int(c) for c in np.array(colors[i]) * 255]
-            img_out = cv2.rectangle(img_out, (x1, y1), (x2, y2), color_rec, 2)
-            img_out = cv2.putText(img_out, caption, (x1, y1), cv2.FONT_HERSHEY_COMPLEX, 0.6, color=(255, 255, 255))
+            img_out = cv2.rectangle(img_out, (x1, y1), (x2, y2), color_rec, 1)
+
+            # выводим надписи
+            # score = scores[i] if scores is not None else None
+            # caption = '{} {:.2f}'.format('human', score) if score else 'human'
+            # img_out = cv2.putText(img_out, caption, (x1, y1), cv2.FONT_HERSHEY_COMPLEX, 0.6, color=(255, 255, 255))
+            img_out = cv2.putText(img_out, title, (int(self.width / 3), self.height - 3), cv2.FONT_HERSHEY_DUPLEX, 0.6,
+                                  color=(255, 255, 255))
 
         return img_out
 
